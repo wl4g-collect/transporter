@@ -1,0 +1,142 @@
+# Copyright (c) 2017 ~ 2025, the original author wangl.sir individual Inc,
+# All rights reserved. Contact us 983708408@qq.com
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+#
+# #### Basic configuration. ####
+#
+
+# Option (ROUTING/NAT) Push service deployment mode, if ROUTING mode, the client login success
+# will receive the cluster node list information returned by the server, otherwise if NAT mode
+# is configured, the server will not return to the cluster node list.
+deployment-mode: ROUTING
+
+# Global message flow business processing thread pool configuration.
+executors.properties:
+  # Hbase persistent thread pool.
+  hbasePersisPool:
+    corePoolSize: 1
+    maximumPoolSize: 10
+    keepAliveTime: 0
+    # Queue size can be received when the thread pool resource is tight.
+    acceptCount: 2000
+
+#
+# #### Redis configuration. ####
+#
+redis:
+  connect-timeout: 6000
+  so-timeout: 10000
+  max-wait-millis: 10000
+  max-total: 60000
+  max-attempts: 20
+  max-idle: 100
+  min-idle: 10
+
+#
+# #### Core(Netty/RPC) configuration. ####
+#
+core:
+  ctl-pkey: transport_
+  ctl-msgId-rowKey-expire: 7200
+  rpc:
+    name: RpcServer
+    startup: true
+    port: 10030
+    backlog: 512
+    # Current node maximum connection number limit.
+    accpet-maxconnects: 1000
+    # Default connection number limit of the same appId.
+    default-appId-connects: 100
+    read-idle-seconds: 600
+    # Unlike the websocket client, the RPC client may be provider, because it may not receive messages at
+    # all and will only be pushed out, so writing a timeout needs to be set longer.
+    write-idle-seconds: 600
+    all-idle-seconds: 900
+    # Prevent DDOS attack.
+    max-content-len: 32768
+  websocket:
+    name: WebSocket
+    startup: true
+    port: 10031
+    backlog: 512
+    # Current node maximum connection number limit.
+    accpet-maxconnects: 1000
+    # Default connection number limit of the same appId.
+    default-appId-connects: 50
+    read-idle-seconds: 600
+    # The meaning of `rpc.write-idle-seconds` in the same way is just the opposite.
+    write-idle-seconds: 600
+    all-idle-seconds: 900
+    http-aggregator:
+      max-content-len: 32768
+
+#
+# #### Actor(Akka) configuration. ####
+#
+akka:
+  system-name: defaultAkkaSystem
+  # This port value must be defined in `seed-nodes`, otherwise it will fail to create clusters, always displaying other nodes of the retry connection.
+  remote.port: 2552
+
+#
+# #### Kafka configuration. ####
+#
+kafka:
+  # Kafka broker address configuration, If multiple nodes are separated by comma, Note: here it is
+  # recommended to use the host name (/etc/hosts settings), because it must be exactly the same as
+  # the Kafka broker boot TCP address. For example, server.properties configuration `host.name=kafka-master`
+  # in Kafka broker, then kafka-client must also configure `bootstrap.servers= kafka-master`.
+  # https://segmentfault.com/a/1190000011022181
+  consumer:
+    # Consumer startup switch.
+    startup: true
+    # Used in consumer.poll(timeout), refers to the waiting time of polling consumer messages.
+    poll-timeout: 1000
+    # Kafka multithreading consumption concurrency.
+    concurrency: 3
+    # Bulk consumption change buffer queue size.
+    queueDepth: 1
+    # Please note that after the `kafka.consumer.props` prefix is removed, the part is defined as key in ConusmerConfig and ProducerConfig.
+    properties:
+      # Kafka broker address configuration, If multiple nodes are separated by comma.
+      bootstrap.servers: ${kafka.bootstrap.servers}
+      # https://blog.csdn.net/lzp158869557/article/details/79099567
+      session.timeout.ms: 10000
+      fetch.min.bytes: 1
+      auto:
+        commit.interval.ms: 3000
+        offset.reset: latest # earliest
+      key.deserializer: org.apache.kafka.common.serialization.StringDeserializer  
+      value.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      enable.auto.commit: false
+      group.id: defaultTransportConsumer
+  producer:
+    # Producer startup switch.
+    startup: true
+    # The Kafka theme corresponds to the number of partitions and needs to be consistent with the Kafka
+    # broker configuration, when the producer sends the message, it will randomly select a partition from it.
+    partition: 10
+    close-timeout: 30
+    # The asynchronous mode is submitted to the Kafka broker switch, and the recommended default
+    # is false, which can reduce unnecessary data loss in high concurrency environment.
+    broker-async: false
+    # Whether the production message is immediately refreshed.
+    auto-flush: true
+    # Please note that after the `kafka.producer.props` prefix is removed, the part is defined as key in ProducerConfig and ProducerConfig.
+    properties:
+      # Kafka broker address configuration, If multiple nodes are separated by comma.
+      bootstrap.servers: ${kafka.bootstrap.servers}
+      zookeeper.connect: ${kafka.zookeeper.connect}
+      acks: all
+      retries: 3
+      batch.size: 1024
+      compression.type: gzip
+      key.serializer: org.apache.kafka.common.serialization.StringSerializer
+      value.serializer: org.apache.kafka.common.serialization.StringSerializer

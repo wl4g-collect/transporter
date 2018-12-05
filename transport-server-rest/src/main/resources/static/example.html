@@ -1,0 +1,84 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <title>Transporter example</title>
+	<link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+<nav class="navbar navbar-inverse" role="navigation">
+	<div class="container-fluid">
+    <div class="navbar-header">
+        <a class="navbar-brand" href="#">Transporter 首页</a>
+    </div>
+    <div>
+        <ul class="nav navbar-nav">
+            <li class="active"><a href="#">iOS</a></li>
+            <li><a href="#">SVN</a></li>
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                    Java <b class="caret"></b>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a href="#">jmeter</a></li>
+                    <li><a href="#">EJB</a></li>
+                    <li><a href="#">Jasper Report</a></li>
+                    <li class="divider"></li>
+                    <li><a href="#">分离的链接</a></li>
+                    <li class="divider"></li>
+                    <li><a href="#">另一个分离的链接</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+	</div>
+</nav>
+
+<script type="text/javascript" src="js/transport-ws-1.5.2.js?t=1253242"></script>
+<script type="text/javascript">
+	window.onload = function() {
+		//
+		// 1.0 初始化组件	
+		window.Transporter.init({
+			wsClusterUris: [
+				"ws://"+window.location.hostname+":10031/ws"
+			],
+			isDebug: false,
+			appId: "fc3a4359b951b450",
+			deviceId: "1234567890e317b4245fdc2cf961046a",
+			groupId: "3468557178274816",
+			senderTimeout: 3000,
+			wsClusterNodeRetry: 3,
+			onMessage: function(data) {
+				console.log("收到消息：" + data);
+			},
+			onResult: function(code, msg){
+				console.log("返回结果: " + code + ", " + msg);
+			}
+		});
+
+		//
+		// 2.0 发送消息到服务器示例.
+		//var testJson = {
+		//	"testKey": "testBrowser1",
+		//	"testData": "从浏览器发送给后台的测试JSON报文."
+		//};
+		//var toDeviceId = "b5bcd9b1f0e317b4245fdc2cf961046a";
+		//var count = 0;
+		//var testTimer = window.setInterval(function(){
+		//	++count;
+		//	console.log("准备发送消息到后台...");
+		//	window.Transporter.send({
+		//		toDeviceId: toDeviceId,
+		//		//toGroupId: "abcdef1111567890",
+		//		payload: JSON.stringify(testJson)
+		//	});
+		//	if(count >= 1)
+		//		window.clearInterval(testTimer);
+		//}, 1000);
+	}
+</script>
+</body>
+</html>

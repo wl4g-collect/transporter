@@ -1,0 +1,70 @@
+# Copyright (c) 2017 ~ 2025, the original author wangl.sir individual Inc,
+# All rights reserved. Contact us 983708408@qq.com
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+# #### Environment(Test) configuration. ####
+#
+# Restful API configuration.
+rest.auth:
+  # More than one IP is separated by a comma.
+  allow-ip: 127.0.0.1
+  disable-ip:
+  users: admin:admin
+
+# Core configuration.
+core:
+  hostname: 0.0.0.0
+
+# Cluster(Akka/Actor) configuration.
+akka:
+  remote:
+    # Address of the internal communication monitor in the cluster, It is strongly recommended to use an intranet 
+    # IP address. Note: the address configured here is consistent with the `cluster.seed-nodes` configuration,
+    # for example, the former is configured to be host1 (host1 is directed to 192.168.1.11) and the latter
+    # is configured to 192.168.1.11 is not allowed, otherwise there will be a cluster of brain fissure problems.
+    hostname: 127.0.0.1
+  cluster.seed-nodes:
+    - 127.0.0.1:2552
+    - 127.0.0.1:3552
+    - 127.0.0.1:4552
+
+# Redis configuration.
+redis:
+  passwd: zzx!@#$%
+  # Redis's cluster nodes.
+  nodes:
+    - safecloud-test:6379
+    - safecloud-test:6380
+    - safecloud-test:6381
+    - safecloud-test:7380
+    - safecloud-test:7380
+    - safecloud-test:7381
+
+# Kafka configuration.
+kafka:
+  # Kafka broker address configuration, If multiple nodes are separated by comma, Note: here it is
+  # recommended to use the host name (/etc/hosts settings), because it must be exactly the same as
+  # the Kafka broker boot TCP address. For example, server.properties configuration `host.name=kafka-master`
+  # in Kafka broker, then kafka-client must also configure `bootstrap.servers= kafka-master`.
+  # https://segmentfault.com/a/1190000011022181
+  bootstrap.servers: 118.31.18.162:9092
+  zookeeper.connect: 118.31.18.162:3181
+
+# Data(Hbase) configuration, please note that after the `hbase.props` prefix is removed, the part is defined
+# as key in HConstants.
+data:
+  properties:
+    # Zk server configuration, If multiple nodes are separated by comma, using the same
+    # zookeeper cluster as Kafka.
+    hbase.zookeeper.quorum: ${kafka.zookeeper.connect}
+
+# Spring-boot admin client config.
+spring.boot.admin:
+  # Registered to admin server.
+  url: http://127.0.0.1:64/sba

@@ -1,0 +1,101 @@
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>transport-server-starter</artifactId>
+	<packaging>jar</packaging>
+	<name>transport-server-starter</name>
+	<url>http://maven.apache.org</url>
+	<description>Transporter</description>
+	<parent>
+		<groupId>io.transport</groupId>
+		<artifactId>transporter</artifactId>
+		<version>${project.parent.version}</version>
+	</parent>
+	<dependencies>
+		<dependency>
+			<groupId>io.transport</groupId>
+			<artifactId>transport-server-cluster</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.transport</groupId>
+			<artifactId>transport-server-data</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.transport</groupId>
+			<artifactId>transport-server-rest</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+	</dependencies>
+	<build>
+		<finalName>transport</finalName>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+				<excludes>
+					<exclude>script/**</exclude>
+				</excludes>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.1</version>
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>${maven-source-plugin.version}</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- Maven plug-in is packaged a external reference jar. -->
+
+			<!-- Since the custom Java -cp $CLASSPATH variable has been used in the startup script, there is no 
+				need to add classpath to the manifest.mf of the main jar again. -->
+			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-jar-plugin</artifactId> 
+				<version>2.6</version> <configuration> <source>${java.version}</source> <target>${java.version}</target> 
+				<skip>true</skip> <archive> <manifest> <mainClass>io.transport.Transport</mainClass> <addClasspath>true</addClasspath> 
+				<classpathPrefix>../libs</classpathPrefix> </manifest> <manifestEntries> <Class-Path>./</Class-Path> 
+				<Built-By>Wangl.sir</Built-By> <Built-Mail-By>983708408@qq.com</Built-Mail-By> <Bundle-Name>Transporter</Bundle-Name> 
+				<Implementation-Vendor>The Transporter Project</Implementation-Vendor> <Implementation-URL>http://transport.wl4g.com/wiki</Implementation-URL> 
+				</manifestEntries> </archive> </configuration> </plugin> -->
+
+			<!-- Assemble plug-in is packaged a external reference jar. -->
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<finalName>transport-${project.parent.version}-bin</finalName>
+					<!-- not append assembly id in release file name -->
+					<appendAssemblyId>false</appendAssemblyId>
+					<descriptors>
+						<descriptor>src/main/assemble/package.xml</descriptor>
+					</descriptors>
+				</configuration>
+				<executions>
+					<execution>
+						<id>make-assembly</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>
